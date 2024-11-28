@@ -31,6 +31,7 @@ class TextDataset(Dataset):
         
         # Tokenize the text and convert to input IDs
         self.tokens = tokenizer.encode(text,return_tensors="pt",add_special_tokens=False)[0]
+        self.tokens = self.tokens.to(self.device)
         
         # Chunk tokens into sequences of fixed length
         self.num_sequences = self.tokens.size(-1) // seq_length
