@@ -27,6 +27,7 @@ class TextDataset(Dataset):
         """
         self.tokenizer = tokenizer
         self.seq_length = seq_length
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         
         # Tokenize the text and convert to input IDs
         self.tokens = tokenizer.encode(text,return_tensors="pt",add_special_tokens=False)[0]
@@ -44,7 +45,7 @@ class TextDataset(Dataset):
         start_idx = idx * self.seq_length
         end_idx = start_idx + self.seq_length
         sequence = torch.cat((torch.tensor((self.tokenizer.bos_token_id,)),self.tokens[start_idx:end_idx]),dim=-1)
-        sequence = torch.tensor(sequence, dtype=torch.long)
+        sequence = torch.tensor(sequence, dtype=torch.long,device=self.device)
         return sequence[:-1],sequence[1:]
     
 class CustomLRScheduler:
@@ -262,7 +263,7 @@ if __name__ == "__main__":
     sep = int(text_lengh*train_config['train_per'])
     train_text = text[:sep]
     val_text = text[sep:]
-
+    
     #Create a dataset
     train_dataset = TextDataset(train_text, tokenizer, model_config['max_len'])
     val_dataset = TextDataset(val_text, tokenizer, model_config['max_len'])
