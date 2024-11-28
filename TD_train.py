@@ -130,6 +130,7 @@ class Trainer:
             #Mixed precision training
             with autocast(self.device.type):
                 outputs = self.model(src_seq,None) #logits of shape (batch_size,max_len,vocab_size)
+                outputs = outputs.to(self.device)
                 loss = self.loss_fn(outputs.view(train_config['batch_size']*model_config['max_len'],-1).softmax(dim=-1),tgt_seq.flatten())
 
             #Scale loss and compute gadients
