@@ -209,6 +209,7 @@ class Trainer:
 
 if __name__ == "__main__":
     tokenizer = GPT2Tokenizer.from_pretrained("gpt2") # Use GPT-2 tokenizer (or another tokenizer)
+    tokenizer.pad_token = tokenizer.eos_token # Add a padding token (if required for batching)
 
     # __ CONFIG ___
     base_model_config = {
