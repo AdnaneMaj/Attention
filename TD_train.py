@@ -233,7 +233,7 @@ if __name__ == "__main__":
         'n_layers' : 2,
         'n_head' : 2,
         'max_len' : 32,
-        'vocab_size' : None,
+        'vocab_size' : tokenizer.vocab_size,
         'pad_idx':tokenizer.pad_token_id,
         'dropout' : 0.1,
     }
