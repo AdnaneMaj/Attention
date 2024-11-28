@@ -251,7 +251,7 @@ if __name__ == "__main__":
     }
 
     # Path to the .txt file
-    file_path = "./tiny_shakespeare.txt"
+    file_path = "Attention/tiny_shakespeare.txt"
 
     # Open the file and read its contents as a single string
     with open(file_path, "r", encoding="utf-8") as file:
