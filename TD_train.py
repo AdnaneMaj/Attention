@@ -27,11 +27,10 @@ class TextDataset(Dataset):
         """
         self.tokenizer = tokenizer
         self.seq_length = seq_length
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         
-        # Tokenize the text and convert to input IDs
-        self.tokens = tokenizer.encode(text,return_tensors="pt",add_special_tokens=False)[0]
-        self.tokens = self.tokens.to(self.device)
+        # Tokenize the text and convert to input IDs, explicitly on the chosen device
+        self.tokens = tokenizer.encode(text, return_tensors="pt", add_special_tokens=False)[0].to(self.device)
         
         # Chunk tokens into sequences of fixed length
         self.num_sequences = self.tokens.size(-1) // seq_length
@@ -45,9 +44,14 @@ class TextDataset(Dataset):
         # Return a sequence of fixed length
         start_idx = idx * self.seq_length
         end_idx = start_idx + self.seq_length
-        sequence = torch.cat((torch.tensor((self.tokenizer.bos_token_id,)),self.tokens[start_idx:end_idx]),dim=-1)
-        sequence = torch.tensor(sequence, dtype=torch.long,device=self.device)
-        return sequence[:-1],sequence[1:]
+        
+        # Create BOS token on the same device as tokens
+        bos_token = torch.tensor([self.tokenizer.bos_token_id], device=self.tokens.device, dtype=torch.long)
+        
+        # Concatenate tensors that are already on the same device
+        sequence = torch.cat((bos_token, self.tokens[start_idx:end_idx]), dim=-1)
+        
+        return sequence[:-1], sequence[1:]
     
 class CustomLRScheduler:
     def __init__(self, optimizer, d_model, warmup_steps):
