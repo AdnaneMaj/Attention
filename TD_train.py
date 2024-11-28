@@ -263,7 +263,7 @@ if __name__ == "__main__":
     sep = int(text_lengh*train_config['train_per'])
     train_text = text[:sep]
     val_text = text[sep:]
-    
+
     #Create a dataset
     train_dataset = TextDataset(train_text, tokenizer, model_config['max_len'])
     val_dataset = TextDataset(val_text, tokenizer, model_config['max_len'])
@@ -274,14 +274,12 @@ if __name__ == "__main__":
         batch_size=train_config['batch_size'], 
         shuffle=True,
         drop_last=True,
-        pin_memory=torch.cuda.is_available()  # This helps with CUDA performance
     )
     val_loader = DataLoader(
         val_dataset, 
         batch_size=train_config['batch_size'], 
         shuffle=True,
         drop_last=True,
-        pin_memory=torch.cuda.is_available()
     )
 
     #create a model
