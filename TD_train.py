@@ -130,7 +130,6 @@ class Trainer:
             #Mixed precision training
             with autocast(self.device.type):
                 outputs = self.model(src_seq,None) #logits of shape (batch_size,max_len,vocab_size)
-                outputs = outputs.to(self.device)
                 loss = self.loss_fn(outputs.view(train_config['batch_size']*model_config['max_len'],-1).softmax(dim=-1),tgt_seq.flatten())
 
             #Scale loss and compute gadients
@@ -268,9 +267,21 @@ if __name__ == "__main__":
     train_dataset = TextDataset(train_text, tokenizer, model_config['max_len'])
     val_dataset = TextDataset(val_text, tokenizer, model_config['max_len'])
 
-    # Create the DataLoader
-    train_loader = DataLoader(train_dataset, batch_size=train_config['batch_size'], shuffle=True,drop_last=True)
-    val_loader = DataLoader(train_dataset, batch_size=train_config['batch_size'], shuffle=True,drop_last=True)
+    # Create the DataLoader and Explicitly specify pin_memory for CUDA for faster data transfer
+    train_loader = DataLoader(
+        train_dataset, 
+        batch_size=train_config['batch_size'], 
+        shuffle=True,
+        drop_last=True,
+        pin_memory=torch.cuda.is_available()  # This helps with CUDA performance
+    )
+    val_loader = DataLoader(
+        val_dataset, 
+        batch_size=train_config['batch_size'], 
+        shuffle=True,
+        drop_last=True,
+        pin_memory=torch.cuda.is_available()
+    )
 
     #create a model
     model = TransformerDecoder(**model_config)
